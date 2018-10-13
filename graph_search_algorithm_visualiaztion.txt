@@ -1,0 +1,52 @@
+Prooject Name: Search Algorithm Visualization
+
+Name: Xuehui Chen
+
+Algorithm: DFS, BFS, A*
+
+Goal: To visualize the process of search algorithm step by step pair with the code excuting.
+
+Plan: 
+1. Environment(processing)
+	1.1 Basic element
+	    1.1.0 Coordinate -- finished
+                                Build a coordinate of the world space
+	    1.1.1 World space(board)
+	    	2D or 3D space --TBD
+	    	how to define the veiw space -- finished
+	    	where should camera loot at? -- finished, just look at 0,0,0
+	    	perspective camera or oth -- finished, not consider anymore
+	    1.1.2 Balls(nodes)
+	    	sphere geometry, phong material -- finished
+		random generate node -- finished
+		custom generate node -- finished
+		mouse select -- in progress
+	    1.1.3 Path(edge) --finished
+	    	line geometry, line material
+	    1.1.4 Lighting
+	    	three spot lights
+
+	1.2 Building environment
+		1.2.1 Gui control
+		1.2.2 Random generate
+		1.2.3 Custom generate
+
+2. Algorithm(easy)
+	chosen from CLRS book
+    2.1 DFS
+
+    2.2 BFS
+    
+    2.3 A*
+
+3. Animation(hard)
+    3.1
+    3.2
+    3.3
+
+4. Set up module for code
+
+
+
+Deliverable
+    a package including html, javascript
