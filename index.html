@@ -2,10 +2,13 @@
 <html>
 <head>
     <title>Graph Search Algorithm</title>
-    <script src="https://threejs.org/build/three.js"></script>
+    <!-- <script src="https://threejs.org/build/three.js"></script> -->
+    <script src="three.js"></script>
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
-    <script src='https://threejs.org/examples/js/libs/dat.gui.min.js'></script>
-
+    <script src="https://threejs.org/examples/js/libs/dat.gui.min.js"></script>
+    <script src="buckets.min.js"></script>
+    <script src="bfs.js"></script>
+    <script src="helper.js"></script>
     <script>
         function mainFunction(){
             let renderer = new THREE.WebGLRenderer( {antialis: true} );
@@ -17,60 +20,40 @@
 
             let scene = new THREE.Scene();
             let aspect = window.innerWidth/window.innerHeight;
-            //let camera = new THREE.OrthographicCamera( 100, 100, 100, 100, 1000, 1000 );
             let camera = new THREE.PerspectiveCamera( 100, aspect, 0.1, 1000 );
 
-            let nodes = [];
-            let positions = [];
-            let numOfNodes = 20;
+            let numOfNodes = 10;
 
             let render = function () {
-
                 renderer.render( scene, camera );
-
             };
 
 
             camera.position.z = 50;
             scene.add(camera);
             scene.add(new THREE.AxesHelper(50));
-            scene.add( new THREE.GridHelper( 100, 25 , 0x0F0F0F, 0xFFFFFF));
-            let lineMaterial = new THREE.LineBasicMaterial( {color: 0x000000} );
+            // scene.add( new THREE.GridHelper( 100, 25 , 0x0F0F0F, 0xFFFFFF));
 
-            let originalGeometry = new THREE.SphereGeometry( 1, 100, 100 );
-            let original = new THREE.Mesh( originalGeometry, new THREE.MeshPhongMaterial( {color: 0xffffff} ) );
-            scene.add( original );
+            // let originalGeometry = new THREE.SphereGeometry( 1, 100, 100 );
+            // let original = new THREE.Mesh( originalGeometry, new THREE.MeshPhongMaterial( {color: 0xffffff} ) );
+            // scene.add( original );
 
-
-
-            for( var i = 0; i < numOfNodes; i++ ){
-                var randomNodeGeometry = new THREE.SphereGeometry( 1, 100, 100 );
-                var randomNodeMaterial = new THREE.MeshPhongMaterial( {color: Math.random() * 0xffffff} );
-                var randomNode = new THREE.Mesh( randomNodeGeometry, randomNodeMaterial );
-                var x = Math.floor( Math.random() * 60 - 30 );
-                var y = Math.floor( Math.random() * 60 - 30 );
-                var z = Math.floor( Math.random() * 60 - 30 );
-                var randomNodePosition = new THREE.Vector3( x, y, z )
-                randomNode.position.set( x, y, z );
-                nodes.push( randomNode );
-                positions.push( randomNodePosition );
-            }
-
-            for( var i = 0; i < numOfNodes; i++ ){
-                for( var j = 0; j < numOfNodes; j++){
-                    var lineGeometry = new THREE.Geometry();
-                    lineGeometry.vertices.push( positions[i] );
-                    lineGeometry.vertices.push( positions[j] );
-                    var line = new THREE.Line( lineGeometry, lineMaterial );
-                    scene.add( line );
-                }
-            }
+            // randomly generate nodes
+            // nodes: ref of node obj
+            let nodes = [];
+            let positions = [];
+            randomGenerateNodes(numOfNodes, nodes, positions);
             
-            for( var i = 0; i < numOfNodes; i++ ){
-                //console.log(nodes[i].position);
-                scene.add(nodes[i]);
-            }
+            // randomly generate edges
+            let edges = randomGenerateEdges(numOfNodes);
+            //let edges = randomGenerate(nodes.length);
 
+            // console.log("check1");
+            // add nodes to scene
+            addNodes(nodes, scene);
+
+            // build add edge lines to scene
+            addLines(edges, positions, scene);
 
             let ambientLight = new THREE.AmbientLight(0x888888, 0.25);
             scene.add(ambientLight);
@@ -86,15 +69,18 @@
                 cz += positions[i].z;
             }
 
-            //console.log( cx/numOfNodes, cy/numOfNodes, cz/numOfNodes )
-
-
 
             let cameraControls = new THREE.OrbitControls( camera, renderer.doElement );
             cameraControls.addEventListener( "change", render, false );
-            //cameraControls.target =  new THREE.Vector3(cx/numOfNodes, cy/numOfNodes, cz/numOfNodes);
 
             render();
+
+            let graph = new Graph(numOfNodes);
+
+            console.log(edges);
+            graph.build(edges)
+
+            bfsSearch(0, graph);
 
             let customNode = {
                 x: 0,
@@ -117,7 +103,7 @@
             let guiNode = gui.addFolder( 'Node' );
             guiNode.addColor( customNode, 'color' );
             guiNode.add( customNode, 'x' , -30, 30 ).name( 'X' );
-            guiNode.add( customNode, 'y' , -30, 30 ).name( 'Y' );
+            // guiNode.add( customNode, 'y' , -30, 30 ).name( 'Y' );
             guiNode.add( customNode, 'z' , -30, 30 ).name( 'Z' );
             guiNode.add( customNode, 'add').name( 'Add' );
 
