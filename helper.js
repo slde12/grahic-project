@@ -1,12 +1,23 @@
 function randomGenerateNodes(numOfNodes, nodes, positions){
+    nodes.length = 0;
+    positions.length = 0;
+
+    // fixed postion for random generator
+    X = [];
+    Z = [];
+    for( var i = 0; i <= 20; i++){
+        X.push(-30 + 3 * i);
+        Z.push(-30 + 3 * i);
+    }
+
     for( var i = 0; i < numOfNodes; i++ ){
         var randomNodeGeometry = new THREE.SphereGeometry( 1, 100, 100 );
         var randomNodeMaterial = new THREE.MeshPhongMaterial( {color: Math.random() * 0xffffff} );
         var randomNode = new THREE.Mesh( randomNodeGeometry, randomNodeMaterial );
-        var x = Math.floor( Math.random() * 60 - 30 );
+        var x = X[Math.floor( Math.random() * 20)];
         // var y = Math.floor( Math.random() * 60 - 30 );
         var y = 0;
-        var z = Math.floor( Math.random() * 60 - 30 );
+        var z = Z[Math.floor( Math.random() * 20)];
         var randomNodePosition = new THREE.Vector3( x, y, z )
         randomNode.position.set( x, y, z );
         nodes.push( randomNode );
@@ -14,32 +25,45 @@ function randomGenerateNodes(numOfNodes, nodes, positions){
     }
 }
 
-function randomGenerateEdges(numOfNodes){
-    var edges;
+function randomGenerateEdges(numOfNodes, lines, positions, edges){
+    lines.length = 0;
+    edges.length = 0;
+
+    // generate a fully connected graph
     var ok;
     while(true){
-        edges = randomGenerate(numOfNodes);
+        randomGenerate(numOfNodes, edges);
+        
         ok = validation(numOfNodes, edges);
         // console.log(ok);
         if(ok) break;
     }
 
-    return edges;
+
+    for(let i = 0; i < edges.length; i++){
+        let start = edges[i][0];
+        let end = edges[i][1];
+        let lineGeometry = new THREE.Geometry();
+        let lineMaterial = new THREE.LineBasicMaterial( {color: 0x000000} );
+        lineGeometry.vertices.push( positions[start] );
+        lineGeometry.vertices.push( positions[end] );
+        var line = new THREE.Line( lineGeometry, lineMaterial );
+        lines.push(line);
+    }
 }
 
-function randomGenerate(numOfNodes){
-    var edges = []
+function randomGenerate(numOfNodes, edges){
+    edges.length = 0;
     for( var i = 0; i < numOfNodes; i++ ){
         for( var j = 0; j < numOfNodes; j++){
             if(i != j){
                 var r = Math.random();
-                if(r > 0.8){
+                if(r > 0.9){
                     edges.push([i, j]);
                 }                
             }
         }
     }
-    return edges;
 }
 
 function validation(numOfNodes, edges){
@@ -67,19 +91,12 @@ function dfs(node, used, graph){
     return ok;
 }
 
-function addLines(edges, positions, scene){
+function addLines(lines, scene){
     // console.log(edges);
     // console.log(positions);
-    for(let i = 0; i < edges.length; i++){
-        let start = edges[i][0];
-        let end = edges[i][1];
-        let lineGeometry = new THREE.Geometry();
-        let lineMaterial = new THREE.LineBasicMaterial( {color: 0x000000} );
-        lineGeometry.vertices.push( positions[start] );
-        lineGeometry.vertices.push( positions[end] );
-        var line = new THREE.Line( lineGeometry, lineMaterial );
-        
-        scene.add( line );
+    let numOfLines = lines.length
+    for(let i = 0; i < numOfLines; i++){
+        scene.add( lines[i] );
     }
 }
 
@@ -89,4 +106,23 @@ function addNodes(nodes, scene){
     for( var i = 0; i < numOfNodes; i++ ){
         scene.add(nodes[i]);
     }
+}
+
+function clearNodes(nodes, scene){
+    for(let node of nodes){
+        scene.remove(node);
+    }
+}
+
+function clearLines(lines, scene){
+    for(let line of lines){
+        scene.remove(line);
+    }
+}
+
+function clearRef(nodes, lines, positions, edges){
+    nodes.length = 0;
+    lines.length = 0;
+    positions.length = 0;
+    edges.length = 0;
 }
