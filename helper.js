@@ -1,4 +1,5 @@
 function randomGenerateNodes(numOfNodes, nodes, positions){
+    console.log(numOfNodes);
     nodes.length = 0;
     positions.length = 0;
 

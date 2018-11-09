@@ -13,6 +13,7 @@ function mainFunction(){
     let numOfNodes = 10;
 
     let render = function () {
+        requestAnimationFrame(render);
         renderer.render( scene, camera );
     };
 
@@ -119,7 +120,12 @@ function mainFunction(){
         run: function () {
             let graph = new Graph(nodes.length);
             graph.build(edges);
-            bfsSearch(0, graph);
+            // let logs = bfsSearch(0, graph);
+
+            // for(let log of logs){
+            //     console.log(log.type, log.note, log.item);
+            // }
+            bfsTest(0, graph, nodes, render());
         }
     }
 
@@ -129,7 +135,7 @@ function mainFunction(){
     let customBuildGraph = gui.addFolder( 'Custom Graph' );
     let animation = gui.addFolder( 'Animation' );
 
-    randomBuildGraph.add( random, 'numOfNodes', 1, 20 ).name( 'Node Size' );
+    randomBuildGraph.add( random, 'numOfNodes' ).min(1).max(30).step(1).name( 'Node Size' );
     randomBuildGraph.add( random, 'generateNodes' ).name( 'Generate Nodes' );
     randomBuildGraph.add( random, 'generateEdges' ).name( 'Generate Edges' );
     randomBuildGraph.add( random, 'clearGraph').name( 'Clear Graph' );
